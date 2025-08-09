@@ -1,22 +1,40 @@
 import { ComponentType, FuelCell, Vent, CoolantCell, ReactorState, ReactorGrid } from './components.js';
 
+/**
+ * Main entry point wiring DOM controls to reactor simulation classes.
+ * JSDoc annotations document types for scalability.
+ */
+
 // Global state
+/** @type {ReactorState} */
 const state = new ReactorState();
 // Create a 6x6 reactor grid
 const gridSize = 6;
+/** @type {ReactorGrid} */
 const grid = new ReactorGrid(gridSize, gridSize, state);
 
 // DOM references
+/** @type {HTMLElement} */
 const gridElement = document.getElementById('grid');
+/** @type {HTMLElement} */
 const heatDisplay = document.getElementById('heat-display');
+/** @type {HTMLElement} */
 const heatCapacityDisplay = document.getElementById('heat-capacity');
+/** @type {HTMLElement} */
 const powerDisplay = document.getElementById('power-display');
+/** @type {HTMLElement} */
 const powerCapacityDisplay = document.getElementById('power-capacity');
+/** @type {HTMLElement} */
 const moneyDisplay = document.getElementById('money-display');
+/** @type {HTMLButtonElement} */
 const sellButton = document.getElementById('sell-power');
+/** @type {HTMLButtonElement} */
 const toggleRunButton = document.getElementById('toggle-run');
 
 // Populate grid DOM
+/**
+ * Populate the grid container with clickable cells.
+ */
 function createGrid() {
   gridElement.style.setProperty('--grid-size', gridSize);
   gridElement.innerHTML = '';
@@ -33,6 +51,7 @@ function createGrid() {
 }
 
 // Palette handling
+/** @type {string|null} */
 let selectedComponent = null;
 const paletteButtons = document.querySelectorAll('.component-button');
 paletteButtons.forEach((btn) => {
@@ -43,6 +62,10 @@ paletteButtons.forEach((btn) => {
   });
 });
 
+/**
+ * Handle placing/removing components when the grid is clicked.
+ * @param {MouseEvent} e
+ */
 function onGridClick(e) {
   const x = parseInt(e.currentTarget.dataset.x, 10);
   const y = parseInt(e.currentTarget.dataset.y, 10);
@@ -79,6 +102,9 @@ function onGridClick(e) {
 }
 
 // Update the DOM representation of the grid
+/**
+ * Update the DOM representation of the reactor grid.
+ */
 function updateGridDisplay() {
   const cells = gridElement.querySelectorAll('.grid-cell');
   cells.forEach((cellDiv) => {
@@ -109,6 +135,9 @@ function updateGridDisplay() {
 }
 
 // Update stats display
+/**
+ * Update displayed heat, power and money stats.
+ */
 function updateStats() {
   heatDisplay.textContent = Math.floor(state.heat);
   heatCapacityDisplay.textContent = state.heatCapacity;
@@ -136,6 +165,9 @@ toggleRunButton.addEventListener('click', () => {
   }
 });
 
+/**
+ * Advance the reactor simulation by one tick and update UI.
+ */
 function gameTick() {
   // Run simulation
   grid.tick();

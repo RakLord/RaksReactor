@@ -9,18 +9,31 @@
  * - ReactorState contains global resources (heat, power, money).
  */
 
-// Enumeration of component types for clarity
+/**
+ * Enumeration of component types for clarity.
+ * @readonly
+ * @enum {string}
+ */
 export const ComponentType = {
   FuelCell: 'fuelCell',
   Vent: 'vent',
   Coolant: 'coolant',
 };
 
-// Context passed to each component during tick
+/**
+ * Context passed to each component during tick containing global state
+ * and the owning grid.
+ */
 export class TickContext {
+  /**
+   * @param {ReactorState} state Global reactor state
+   * @param {ReactorGrid} grid Reactor grid instance
+   */
   constructor(state, grid) {
-    this.state = state; // ReactorState
-    this.grid = grid;   // ReactorGrid
+    /** @type {ReactorState} */
+    this.state = state;
+    /** @type {ReactorGrid} */
+    this.grid = grid;
   }
 }
 
@@ -30,18 +43,33 @@ export class TickContext {
  * method to produce heat/power or dissipate heat.
  */
 export class ReactorComponent {
+  /**
+   * @param {ComponentType[keyof ComponentType]} type Component identifier
+   * @param {number} cost Build cost in dollars
+   */
   constructor(type, cost) {
+    /** @type {ComponentType[keyof ComponentType]} */
     this.type = type;
+    /** @type {number} */
     this.cost = cost;
+    /** @type {number} */
     this.x = 0;
+    /** @type {number} */
     this.y = 0;
   }
-  // Set by ReactorGrid when placed
+  /**
+   * Set the grid position for this component.
+   * @param {number} x
+   * @param {number} y
+   */
   setPosition(x, y) {
     this.x = x;
     this.y = y;
   }
-  // Perform per‑tick update; override in subclasses
+  /**
+   * Perform per‑tick update; override in subclasses.
+   * @param {TickContext} ctx
+   */
   tick(ctx) {}
 }
 
@@ -53,11 +81,19 @@ export class ReactorComponent {
 export class FuelCell extends ReactorComponent {
   constructor() {
     super(ComponentType.FuelCell, 10);
+    /** @type {number} */
     this.basePower = 1;
+    /** @type {number} */
     this.baseHeat = 1;
+    /** @type {number} */
     this.lifespan = 15 * 60; // ticks (60 seconds) lifespan
+    /** @type {number} */
     this.age = 0;
   }
+  /**
+   * Number of pulses determined by neighbouring fuel cells.
+   * @type {number}
+   */
   get pulses() {
     // Count neighbouring fuel cells to determine pulses.  Each neighbour adds one pulse.
     let count = 1; // base pulse for itself
@@ -67,10 +103,18 @@ export class FuelCell extends ReactorComponent {
     });
     return count;
   }
+  /**
+   * Adjacent components on the grid.
+   * @type {ReactorComponent[]}
+   */
   get gridNeighbours() {
     if (!this.gridRef) return [];
     return this.gridRef.getAdjacent(this.x, this.y);
   }
+  /**
+   * Produce power and heat for one tick.
+   * @param {TickContext} ctx
+   */
   tick(ctx) {
     // Skip if depleted
     if (this.age >= this.lifespan) return;
@@ -93,8 +137,13 @@ export class FuelCell extends ReactorComponent {
 export class Vent extends ReactorComponent {
   constructor() {
     super(ComponentType.Vent, 5);
+    /** @type {number} */
     this.coolingRate = 2; // heat removed per tick
   }
+  /**
+   * Remove heat from the reactor state.
+   * @param {TickContext} ctx
+   */
   tick(ctx) {
     ctx.state.removeHeat(this.coolingRate);
   }
@@ -110,14 +159,23 @@ export class Vent extends ReactorComponent {
 export class CoolantCell extends ReactorComponent {
   constructor() {
     super(ComponentType.Coolant, 20);
+    /** @type {number} */
     this.capacity = 200;
+    /** @type {number} */
     this.storedHeat = 0;
   }
+  /**
+   * Coolant cells do not perform any active behaviour per tick.
+   * @param {TickContext} ctx
+   */
   tick(ctx) {
-    // Coolant cells do not perform any active behaviour per tick.
     // Heat is stored via heat distribution (handled by ReactorGrid).
   }
-  // Accept heat up to capacity and return any excess heat
+  /**
+   * Accept heat up to capacity and return any excess heat.
+   * @param {number} amount
+   * @returns {number} Excess heat not stored
+   */
   acceptHeat(amount) {
     const space = this.capacity - this.storedHeat;
     const accepted = Math.min(space, amount);
@@ -132,22 +190,43 @@ export class CoolantCell extends ReactorComponent {
  */
 export class ReactorState {
   constructor() {
+    /** @type {number} */
     this.heat = 0;
+    /** @type {number} */
     this.heatCapacity = 1000;
+    /** @type {number} */
     this.power = 0;
+    /** @type {number} */
     this.powerCapacity = 100;
+    /** @type {number} */
     this.money = 50;
   }
+  /**
+   * Increase reactor heat.
+   * @param {number} amount
+   */
   addHeat(amount) {
     this.heat += amount;
     // Overflow remains as heat; melt‑down checks occur in game loop
   }
+  /**
+   * Remove heat from the reactor.
+   * @param {number} amount
+   */
   removeHeat(amount) {
     this.heat = Math.max(0, this.heat - amount);
   }
+  /**
+   * Add power up to capacity.
+   * @param {number} amount
+   */
   addPower(amount) {
     this.power = Math.min(this.power + amount, this.powerCapacity);
   }
+  /**
+   * Convert stored power into money.
+   * @returns {number} Amount of power sold
+   */
   sellPower() {
     const sold = this.power;
     this.power = 0;
@@ -161,10 +240,19 @@ export class ReactorState {
  * ReactorGrid manages the placement of components and heat distribution.
  */
 export class ReactorGrid {
+  /**
+   * @param {number} width Grid width in cells
+   * @param {number} height Grid height in cells
+   * @param {ReactorState} state Owning reactor state
+   */
   constructor(width, height, state) {
+    /** @type {number} */
     this.width = width;
+    /** @type {number} */
     this.height = height;
+    /** @type {(ReactorComponent|null)[][]} */
     this.cells = [];
+    /** @type {ReactorState} */
     this.state = state;
     for (let y = 0; y < height; y++) {
       const row = [];
@@ -174,7 +262,13 @@ export class ReactorGrid {
       this.cells.push(row);
     }
   }
-  // Place a component at (x,y) if empty; return true if successful
+  /**
+   * Place a component at (x,y) if empty.
+   * @param {ReactorComponent} comp
+   * @param {number} x
+   * @param {number} y
+   * @returns {boolean} True if placement succeeded
+   */
   placeComponent(comp, x, y) {
     if (!this.inBounds(x, y)) return false;
     if (this.cells[y][x]) return false;
@@ -183,15 +277,32 @@ export class ReactorGrid {
     comp.gridRef = this;
     return true;
   }
+  /**
+   * Remove a component at the specified location.
+   * @param {number} x
+   * @param {number} y
+   */
   removeComponent(x, y) {
     if (!this.inBounds(x, y)) return;
     const comp = this.cells[y][x];
     if (!comp) return;
     this.cells[y][x] = null;
   }
+  /**
+   * Check if coordinates fall within the grid bounds.
+   * @param {number} x
+   * @param {number} y
+   * @returns {boolean}
+   */
   inBounds(x, y) {
     return x >= 0 && x < this.width && y >= 0 && y < this.height;
   }
+  /**
+   * Retrieve adjacent components for a cell.
+   * @param {number} x
+   * @param {number} y
+   * @returns {ReactorComponent[]}
+   */
   getAdjacent(x, y) {
     const neighbours = [];
     const dirs = [
