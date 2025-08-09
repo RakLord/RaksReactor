@@ -1,37 +1,57 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="forest">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Incremental Reactor Game</title>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-  <header>
-    <h1>Incremental Reactor</h1>
-    <div id="stats">
-      <div>Heat: <span id="heat-display">0</span>/<span id="heat-capacity">1000</span></div>
-      <div>Power: <span id="power-display">0</span>/<span id="power-capacity">100</span></div>
-      <div>Money: $<span id="money-display">0</span></div>
+<body class="min-h-screen flex flex-col">
+  <header class="navbar bg-neutral text-neutral-content flex-col gap-2">
+    <h1 class="text-3xl font-bold">Incremental Reactor</h1>
+    <div id="stats" class="stats shadow">
+      <div class="stat">
+        <div class="stat-title">Heat</div>
+        <div class="stat-value"><span id="heat-display">0</span></div>
+        <div class="stat-desc">/<span id="heat-capacity">1000</span></div>
+      </div>
+      <div class="stat">
+        <div class="stat-title">Power</div>
+        <div class="stat-value"><span id="power-display">0</span></div>
+        <div class="stat-desc">/<span id="power-capacity">100</span></div>
+      </div>
+      <div class="stat">
+        <div class="stat-title">Money</div>
+        <div class="stat-value">$<span id="money-display">0</span></div>
+      </div>
     </div>
   </header>
-  <main>
-    <section id="controls">
-      <button id="sell-power">Sell Power</button>
-      <button id="toggle-run">Start</button>
+  <main class="flex flex-wrap justify-center p-4 gap-4 flex-1">
+    <section id="controls" class="basis-full text-center">
+      <button id="sell-power" class="btn btn-accent mr-2">Sell Power</button>
+      <button id="toggle-run" class="btn btn-primary">Start</button>
     </section>
-    <section id="palette">
-      <h2>Components</h2>
-      <div class="component-button" data-component="fuelCell">Fuel Cell ($10)</div>
-      <div class="component-button" data-component="vent">Vent ($5)</div>
-      <div class="component-button" data-component="coolant">Coolant ($20)</div>
-      <div class="component-button" data-component="delete">Remove</div>
+    <section id="palette" class="card bg-base-200 shadow w-64">
+      <div class="card-body">
+        <h2 class="card-title">Components</h2>
+        <div class="flex flex-col gap-2">
+          <button class="btn component-button" data-component="fuelCell">Fuel Cell ($10)</button>
+          <button class="btn component-button" data-component="vent">Vent ($5)</button>
+          <button class="btn component-button" data-component="coolant">Coolant ($20)</button>
+          <button class="btn btn-error component-button" data-component="delete">Remove</button>
+        </div>
+      </div>
     </section>
-    <section id="grid-container">
-      <h2>Reactor Grid</h2>
-      <div id="grid"></div>
+    <section id="grid-container" class="card bg-base-200 shadow">
+      <div class="card-body">
+        <h2 class="card-title">Reactor Grid</h2>
+        <div id="grid"></div>
+      </div>
     </section>
   </main>
   <script type="module" src="main.js"></script>
 </body>
 </html>
+
