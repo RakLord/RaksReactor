@@ -16,17 +16,21 @@
   border-radius: 0.125rem;
 }
 
-.grid-cell.fuelCell {
-  background-color: #eab308;
-}
+  .grid-cell.u238 {
+    background-color: #eab308;
+  }
 
-.grid-cell.vent {
-  background-color: #7dd3fc;
-}
+  .grid-cell.u235 {
+    background-color: #fde047;
+  }
 
-.grid-cell.coolant {
-  background-color: #fca5a5;
-}
+  .grid-cell.water {
+    background-color: #7dd3fc;
+  }
+
+  .grid-cell.coolant {
+    background-color: #fca5a5;
+  }
 
 .component-button.selected {
   outline: 2px solid #eab308;

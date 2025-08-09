@@ -31,17 +31,18 @@
   <main class="flex flex-wrap justify-center p-4 gap-4 flex-1">
     <section id="controls" class="basis-full text-center">
       <button id="sell-power" class="btn btn-accent mr-2">Sell Power</button>
-      <button id="toggle-run" class="btn btn-primary">Start</button>
+        <button id="toggle-run" class="btn btn-primary">Pause</button>
     </section>
     <section id="palette" class="card bg-base-200 shadow w-64">
       <div class="card-body">
         <h2 class="card-title">Components</h2>
-        <div class="flex flex-col gap-2">
-          <button class="btn component-button" data-component="fuelCell">Fuel Cell ($10)</button>
-          <button class="btn component-button" data-component="vent">Vent ($5)</button>
-          <button class="btn component-button" data-component="coolant">Coolant ($20)</button>
-          <button class="btn btn-error component-button" data-component="delete">Remove</button>
-        </div>
+          <div class="flex flex-col gap-2">
+            <button class="btn component-button" data-component="u238">U-238 Cell ($10)</button>
+            <button class="btn component-button" data-component="u235">U-235 Cell ($15)</button>
+            <button class="btn component-button" data-component="water">Water Cell ($5)</button>
+            <button class="btn component-button" data-component="coolant">Coolant ($20)</button>
+            <button class="btn btn-error component-button" data-component="delete">Remove</button>
+          </div>
       </div>
     </section>
     <section id="grid-container" class="card bg-base-200 shadow">
