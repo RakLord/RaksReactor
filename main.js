@@ -36,7 +36,8 @@ const toggleRunButton = document.getElementById('toggle-run');
  * Populate the grid container with clickable cells.
  */
 function createGrid() {
-  gridElement.style.setProperty('--grid-size', gridSize);
+  gridElement.style.gridTemplateColumns = `repeat(${gridSize}, 2.5rem)`;
+  gridElement.style.gridTemplateRows = `repeat(${gridSize}, 2.5rem)`;
   gridElement.innerHTML = '';
   for (let y = 0; y < gridSize; y++) {
     for (let x = 0; x < gridSize; x++) {

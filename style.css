@@ -1,98 +1,34 @@
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f3f3f3;
-  color: #333;
-}
-
-header {
-  background: #222;
-  color: #fff;
-  padding: 1rem;
-  text-align: center;
-}
-
-#stats {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  margin-top: 0.5rem;
-}
-
-main {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  padding: 1rem;
-  gap: 2rem;
-}
-
-#controls {
-  flex-basis: 100%;
-  text-align: center;
-  margin-bottom: 1rem;
-}
-
-#palette {
-  background: #fff;
-  padding: 1rem;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  max-width: 200px;
-}
-
-#palette h2 {
-  margin-top: 0;
-}
-
-.component-button {
-  padding: 0.5rem;
-  margin-bottom: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  cursor: pointer;
-  text-align: center;
-  background: #fafafa;
-}
-
-.component-button.selected {
-  background: #b3d1ff;
-  border-color: #5b8def;
-}
-
-#grid-container {
-  background: #fff;
-  padding: 1rem;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
 #grid {
   display: grid;
-  grid-template-columns: repeat(var(--grid-size, 6), 40px);
-  grid-template-rows: repeat(var(--grid-size, 6), 40px);
-  gap: 2px;
+  gap: 0.25rem;
   margin-top: 0.5rem;
 }
 
 .grid-cell {
-  width: 40px;
-  height: 40px;
-  background: #e0e0e0;
+  width: 2.5rem;
+  height: 2.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   cursor: pointer;
+  background-color: #1f2937;
+  border-radius: 0.125rem;
 }
 
 .grid-cell.fuelCell {
-  background: #ffebcd;
+  background-color: #eab308;
 }
+
 .grid-cell.vent {
-  background: #cdeffd;
+  background-color: #7dd3fc;
 }
+
 .grid-cell.coolant {
-  background: #fddede;
+  background-color: #fca5a5;
 }
+
+.component-button.selected {
+  outline: 2px solid #eab308;
+}
+
