@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Incremental Reactor Game</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>Incremental Reactor</h1>
+    <div id="stats">
+      <div>Heat: <span id="heat-display">0</span>/<span id="heat-capacity">1000</span></div>
+      <div>Power: <span id="power-display">0</span>/<span id="power-capacity">100</span></div>
+      <div>Money: $<span id="money-display">0</span></div>
+    </div>
+  </header>
+  <main>
+    <section id="controls">
+      <button id="sell-power">Sell Power</button>
+      <button id="toggle-run">Start</button>
+    </section>
+    <section id="palette">
+      <h2>Components</h2>
+      <div class="component-button" data-component="fuelCell">Fuel Cell ($10)</div>
+      <div class="component-button" data-component="vent">Vent ($5)</div>
+      <div class="component-button" data-component="coolant">Coolant ($20)</div>
+      <div class="component-button" data-component="delete">Remove</div>
+    </section>
+    <section id="grid-container">
+      <h2>Reactor Grid</h2>
+      <div id="grid"></div>
+    </section>
+  </main>
+  <script type="module" src="main.js"></script>
+</body>
+</html>
