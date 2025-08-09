@@ -4,7 +4,7 @@
  *
  * The design follows the structure described in the accompanying game plan:
  * - ReactorComponent is the abstract base for all components.
- * - FuelCell, Vent and CoolantCell extend ReactorComponent.
+ * - FuelCell, WaterCell and CoolantCell extend ReactorComponent.
  * - ReactorGrid manages placement and simulation of components on a grid.
  * - ReactorState contains global resources (heat, power, money).
  */
@@ -15,8 +15,9 @@
  * @enum {string}
  */
 export const ComponentType = {
-  FuelCell: 'fuelCell',
-  Vent: 'vent',
+  U238: 'u238',
+  U235: 'u235',
+  Water: 'water',
   Coolant: 'coolant',
 };
 
@@ -46,12 +47,15 @@ export class ReactorComponent {
   /**
    * @param {ComponentType[keyof ComponentType]} type Component identifier
    * @param {number} cost Build cost in dollars
+   * @param {string} name Display name
    */
-  constructor(type, cost) {
+  constructor(type, cost, name) {
     /** @type {ComponentType[keyof ComponentType]} */
     this.type = type;
     /** @type {number} */
     this.cost = cost;
+    /** @type {string} */
+    this.name = name;
     /** @type {number} */
     this.x = 0;
     /** @type {number} */
@@ -67,6 +71,13 @@ export class ReactorComponent {
     this.y = y;
   }
   /**
+   * Retrieve a descriptive string for tooltips.
+   * @returns {string}
+   */
+  info() {
+    return this.name;
+  }
+  /**
    * Perform per‑tick update; override in subclasses.
    * @param {TickContext} ctx
    */
@@ -79,12 +90,19 @@ export class ReactorComponent {
  * fuel cell has a lifespan; when it expires the cell stops producing.
  */
 export class FuelCell extends ReactorComponent {
-  constructor() {
-    super(ComponentType.FuelCell, 10);
+  /**
+   * @param {ComponentType[keyof ComponentType]} type
+   * @param {string} name
+   * @param {number} cost
+   * @param {number} basePower
+   * @param {number} baseHeat
+   */
+  constructor(type, name, cost, basePower, baseHeat) {
+    super(type, cost, name);
     /** @type {number} */
-    this.basePower = 1;
+    this.basePower = basePower;
     /** @type {number} */
-    this.baseHeat = 1;
+    this.baseHeat = baseHeat;
     /** @type {number} */
     this.lifespan = 15 * 60; // ticks (60 seconds) lifespan
     /** @type {number} */
@@ -122,30 +140,74 @@ export class FuelCell extends ReactorComponent {
     // Determine pulses
     const p = this.pulses;
     // Power and heat generation follow simplified linear model.  In the full game
-    // heat generation should grow quadratically with pulses【1989524904205†L227-L244】.
+    // heat generation should grow quadratically with pulses.
     const powerGenerated = this.basePower * p;
     const heatGenerated = this.baseHeat * p;
     ctx.state.addPower(powerGenerated);
     ctx.state.addHeat(heatGenerated);
   }
+  /**
+   * Descriptive information for tooltips.
+   * @returns {string}
+   */
+  info() {
+    return `${this.name}\nAge: ${this.age}/${this.lifespan}`;
+  }
 }
 
 /**
- * Vent component.  Removes heat from the system each tick.  In this
- * simplified model the vent always cools the reactor heat pool directly.
+ * Uranium-238 fuel cell type.
  */
-export class Vent extends ReactorComponent {
+export class Uranium238Cell extends FuelCell {
   constructor() {
-    super(ComponentType.Vent, 5);
+    super(ComponentType.U238, 'U-238 Fuel Cell', 10, 1, 1);
+  }
+}
+
+/**
+ * Uranium-235 fuel cell type.
+ */
+export class Uranium235Cell extends FuelCell {
+  constructor() {
+    super(ComponentType.U235, 'U-235 Fuel Cell', 15, 2, 2);
+  }
+}
+
+/**
+ * Water cell. Absorbs heat from adjacent fuel cells and stores it.
+ */
+export class WaterCell extends ReactorComponent {
+  constructor() {
+    super(ComponentType.Water, 5, 'Water Cell');
     /** @type {number} */
-    this.coolingRate = 2; // heat removed per tick
+    this.absorptionRate = 1;
+    /** @type {number} */
+    this.capacity = 100;
+    /** @type {number} */
+    this.storedHeat = 0;
   }
   /**
-   * Remove heat from the reactor state.
+   * Absorb heat from adjacent fuel cells.
    * @param {TickContext} ctx
    */
   tick(ctx) {
-    ctx.state.removeHeat(this.coolingRate);
+    const neighbours = ctx.grid.getAdjacent(this.x, this.y);
+    neighbours.forEach((comp) => {
+      if (comp instanceof FuelCell && ctx.state.heat > 0) {
+        const amount = Math.min(this.absorptionRate, ctx.state.heat);
+        ctx.state.removeHeat(amount);
+        const space = this.capacity - this.storedHeat;
+        const accepted = Math.min(space, amount);
+        this.storedHeat += accepted;
+      }
+    });
+  }
+  /**
+   * Tooltip information.
+   * @returns {string}
+   */
+  info() {
+    return `${this.name}\nStored Heat: ${this.storedHeat}/${this.capacity}`;
   }
 }
 
@@ -323,8 +385,8 @@ export class ReactorGrid {
   }
   /**
    * Perform one simulation tick: update each component, then distribute heat
-   * from the reactor pool into coolant cells.  Vent cooling is handled in
-   * each vent's tick.
+   * from the reactor pool into coolant cells.  Water absorption is handled in
+   * each water cell's tick.
    */
   tick() {
     const ctx = new TickContext(this.state, this);

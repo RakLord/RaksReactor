@@ -1,4 +1,13 @@
-import { ComponentType, FuelCell, Vent, CoolantCell, ReactorState, ReactorGrid } from './components.js';
+import {
+  ComponentType,
+  Uranium238Cell,
+  Uranium235Cell,
+  WaterCell,
+  CoolantCell,
+  ReactorState,
+  ReactorGrid,
+  FuelCell,
+} from './components.js';
 
 /**
  * Main entry point wiring DOM controls to reactor simulation classes.
@@ -78,22 +87,26 @@ function onGridClick(e) {
   }
   // Determine component class based on selectedComponent
   let comp;
-  switch (selectedComponent) {
-    case 'fuelCell':
-      if (state.money < 10) return; // not enough money
-      comp = new FuelCell();
-      break;
-    case 'vent':
-      if (state.money < 5) return;
-      comp = new Vent();
-      break;
-    case 'coolant':
-      if (state.money < 20) return;
-      comp = new CoolantCell();
-      break;
-    default:
-      return;
-  }
+    switch (selectedComponent) {
+      case 'u238':
+        if (state.money < 10) return; // not enough money
+        comp = new Uranium238Cell();
+        break;
+      case 'u235':
+        if (state.money < 15) return;
+        comp = new Uranium235Cell();
+        break;
+      case 'water':
+        if (state.money < 5) return;
+        comp = new WaterCell();
+        break;
+      case 'coolant':
+        if (state.money < 20) return;
+        comp = new CoolantCell();
+        break;
+      default:
+        return;
+    }
   const placed = grid.placeComponent(comp, x, y);
   if (placed) {
     state.money -= comp.cost;
@@ -115,13 +128,15 @@ function updateGridDisplay() {
     cellDiv.classList.remove(...Object.values(ComponentType));
     if (comp) {
       cellDiv.classList.add(comp.type);
-      // Display a simple initial for the component
       switch (comp.type) {
-        case ComponentType.FuelCell:
-          cellDiv.textContent = 'F';
+        case ComponentType.U238:
+          cellDiv.textContent = '238';
           break;
-        case ComponentType.Vent:
-          cellDiv.textContent = 'V';
+        case ComponentType.U235:
+          cellDiv.textContent = '235';
+          break;
+        case ComponentType.Water:
+          cellDiv.textContent = 'W';
           break;
         case ComponentType.Coolant:
           cellDiv.textContent = 'C';
@@ -129,8 +144,10 @@ function updateGridDisplay() {
         default:
           cellDiv.textContent = '';
       }
+      cellDiv.title = comp.info();
     } else {
       cellDiv.textContent = '';
+      cellDiv.title = '';
     }
   });
 }
@@ -153,8 +170,9 @@ sellButton.addEventListener('click', () => {
   updateStats();
 });
 
-let running = false;
-let tickInterval = null;
+let running = true;
+let tickInterval = setInterval(gameTick, 1000);
+toggleRunButton.textContent = 'Pause';
 toggleRunButton.addEventListener('click', () => {
   running = !running;
   toggleRunButton.textContent = running ? 'Pause' : 'Start';
