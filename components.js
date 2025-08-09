@@ -206,8 +206,8 @@ export class ReactorState {
    * @param {number} amount
    */
   addHeat(amount) {
-    this.heat += amount;
-    // Overflow remains as heat; melt‑down checks occur in game loop
+    // Increase heat but do not exceed capacity
+    this.heat = Math.min(this.heat + amount, this.heatCapacity);
   }
   /**
    * Remove heat from the reactor.
