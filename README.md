@@ -27,8 +27,10 @@ not require a web server.  You should see:
 * **Delete** – removes the component from the selected grid cell.
 
 **Start** the simulation and watch heat and power accumulate.  **Sell Power**
-converts all stored power into money.  When heat exceeds the reactor’s
-capacity, a melt‑down occurs and all fuel cells are removed.
+converts all stored power into money.  Heat and power are capped at their
+respective capacities.  When heat reaches capacity, a melt‑down occurs and all
+fuel cells are removed.  If power reaches capacity, the reactor overloads and
+all components are destroyed.
 
 This prototype implements only a small subset of the planned features.  It
 serves as a foundation for further development with Codex, such as adding

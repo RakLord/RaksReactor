@@ -172,8 +172,8 @@ toggleRunButton.addEventListener('click', () => {
 function gameTick() {
   // Run simulation
   grid.tick();
-  // Check for overheat; if heat exceeds capacity, remove all fuel cells and reset heat
-  if (state.heat > state.heatCapacity) {
+  // Check for overheat; if heat reaches capacity, remove all fuel cells and reset heat
+  if (state.heat >= state.heatCapacity) {
     alert('Reactor Meltdown! All fuel cells destroyed.');
     // Remove all fuel cells but leave other components
     for (let y = 0; y < grid.height; y++) {
@@ -184,6 +184,17 @@ function gameTick() {
         }
       }
     }
+    state.heat = 0;
+  }
+  // Check for power overload; if power reaches capacity, destroy all components
+  if (state.power >= state.powerCapacity) {
+    alert('Reactor Overload! All components destroyed.');
+    for (let y = 0; y < grid.height; y++) {
+      for (let x = 0; x < grid.width; x++) {
+        grid.removeComponent(x, y);
+      }
+    }
+    state.power = 0;
     state.heat = 0;
   }
   updateStats();
